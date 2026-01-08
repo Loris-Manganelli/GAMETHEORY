@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.optimize import linprog
+from C02_emissions import grad_emissions
 
 def single_EV_water_filling(load, arrival, departure, energy_need) :
     max_power = 7 #kW
@@ -13,6 +15,13 @@ def single_EV_water_filling(load, arrival, departure, energy_need) :
         slots = np.array(np.argmin(load[eligible_slots] + charging_schedule[eligible_slots]))
         charging_schedule[eligible_slots[slots]] += power_increment #add some charging to all optimal slots
     return charging_schedule #array of size 48 containing charging power at each time slot
+
+def single_EV_linprogram(load, arrival, departure, energy_need):
+    bounds = [(0, 7) if (i >= arrival or i < departure) else (0, 0) for i in range(48)] #bounds for each time slot
+    c = [grad_emissions(load) for _ in range(48)] #cost function coefficients
+    A_eq = np.diag([1 if (i >= arrival or i < departure) else 0 for i in range(48)]) #equality constraint coefficients
+    b_eq = [energy_need / 0.5] #total energy needed in k
+    return linprog(c, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
 
 if __name__ == "__main__":
     #Example of usage
