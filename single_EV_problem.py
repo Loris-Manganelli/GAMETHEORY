@@ -11,7 +11,6 @@ def single_EV_water_filling(load, arrival, departure, energy_need) :
     charging_schedule = np.zeros(48)
     while charging_schedule.sum() < energy_need/time_slot_duration:  #while the total charging is not sufficient
         eligible_slots = np.where((charging_schedule < max_power) & ((np.arange(48) >= arrival) | (np.arange(48) < departure)))[0] #eligible slots for charging : betxeen arrival and departure, and max power not reached
-        print(eligible_slots)
         slots = np.array(np.argmin(load[eligible_slots] + charging_schedule[eligible_slots]))
         charging_schedule[eligible_slots[slots]] += power_increment #add some charging to all optimal slots
     return charging_schedule #array of size 48 containing charging power at each time slot
