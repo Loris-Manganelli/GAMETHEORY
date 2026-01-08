@@ -16,7 +16,6 @@ def bestResponseDynamics(initialProfile, idList, date, eta, K):
     profile = initialProfile.copy()
     converged = False
     J = len(idList) # nombre de VE
-    timeSlots = initialProfile.shape[1] # nombre de créneaux temporels
 
 # Récupération de la charge fixe
     month = date.month
@@ -27,8 +26,31 @@ def bestResponseDynamics(initialProfile, idList, date, eta, K):
     dailyDf = df[df["date"].dt.date == pd.to_datetime(date).date()]
     fixedLoad = dailyDf["consumption"].values
 
+# Récupération des heures d'arrivée et de départ des VE
+    df = pd.read_csv('data/ev_scenarios.csv')
+    df['day'] = pd.to_datetime(df['day'], format='%d/%m/%Y')
+    df_selection = df[df['day'].dt.date == date]
+
+    arrival = np.zeros(J)
+    departure = np.zeros(J)
+    energy_need = np.zeros(J)
+
+    for j in range(J):
+        thisType = df_selection[df_selection['ev_id'] == idList[j]]
+        
+        arrival[j] = int(thisType['time_slot_arr'].values[0])
+        departure[j] = int(thisType['time_slot_dep'].values[0])
+        energy_need[j] = float(thisType['energy_need (kWh)'].values[0])
+
+
     while not converged and k<=K:
         k = k+1
+        newProfile = profile.copy()
         for j in range(J):
-            load = fixedLoad + profile.sum(axis=0) - profile[j,:]
-            profile[j,:] = single_EV_water_filling(load, date, eta, idList[j])
+            load = fixedLoad + newProfile.sum(axis=0) - newProfile[j,:]
+            newProfile[j,:] = single_EV_water_filling(load, arrival[j], departure[j], energy_need[j])
+
+        totalVariation = sum((newProfile - profile)**2)
+        if totalVariation < eta:
+            converged = True
+        profile = newProfile
