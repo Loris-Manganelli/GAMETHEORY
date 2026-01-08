@@ -68,23 +68,23 @@ if __name__ == "__main__":
     np.random.seed(0)
     J = 5 # nombre de VE
     timeSlots = 48 # nombre de créneaux temporels
-    initialProfile = np.random.rand(J, timeSlots)*3 # profil initial aléatoire
-    idList = [1, 1, 3, 5, 10]
+    initialProfile = np.random.rand(J, timeSlots) # profil initial aléatoire
+    idList = np.random.randint(1, 10, size=J)  # liste des identifiants des VE
     from datetime import datetime
     date = datetime(2019, 1, 1).date() # date choisie
-    eta = 1e-3
+    eta = 1e-2
     K = 100
 
     profile = bestResponseDynamics(initialProfile, idList, date, eta, K)
 
-    fig, axes = plt.subplots(5, 1, figsize=(10, 12), sharex=True)  # sharex si tu veux le même axe x
+    fig, axes = plt.subplots(J, 1, figsize=(10, 12), sharex=True)  # sharex si tu veux le même axe x
 
     for i in range(J):
         axes[i].plot(profile[i])
-        axes[i].set_title(f'Véhicule n°{i+1}')
+        axes[i].set_title(f'Véhicule n°{i+1}, ID {idList[i]}')
         axes[i].grid(True)
 
     plt.xlabel('Time slots')
     plt.ylabel('Charging Power (kW)')
     plt.tight_layout()
-    plt.savefig('files/best_response_dynamics_ev_charging.png')
+    plt.savefig(f'files/best_response_dynamics_ev_charging_{J}_{date}.png')
