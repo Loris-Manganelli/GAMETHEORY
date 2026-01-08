@@ -1,3 +1,5 @@
 - linear approx of the CO2 function. Study validity of hypothesis depending on the size of aggregated vehicles.
 
 -priority : simple resolution of 1-EV problem
+
+- prove that water-filling is correct when the function is convex (not the case here !)

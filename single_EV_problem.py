@@ -3,9 +3,12 @@ import numpy as np
 def single_EV_water_filling(load, day, month, ev_id) :
     #data = np.loadtxt('data/ev_scenarios.csv', delimiter = ';', skiprows = 1)
     #print(data)
+    #to be obtained from data
     arrival = 36 #time slot (= 18h)
     departure = 14 #time slot (= 7h)
     energy_need = 8 #kWh
+
+    
     max_power = 7 #kW
     power_increment = 0.2 #kW
     time_slot_duration = 0.5 #hours
