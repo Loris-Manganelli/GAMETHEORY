@@ -1,7 +1,6 @@
 a faire :
 
 - faire une fonction qui compare les résultats des émissions totales + temps de calculs avec Water filling, LP, MILP
-- coder les stratégies standard
 - coder la possibilité de faire des véhicules représentatifs
 - comparer les différentes méthodes sur un seul VE avec les vrais données
 - comparer les différentes méthodes avec tous les VE et best-response dynamics

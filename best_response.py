@@ -4,12 +4,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 from C02_emissions import calculate_emissions
+from data_extractor import data_extractor
 
-def bestResponseDynamics(initialProfile, idList, date, eta, K, single_EV_method = 'MILP') :
+def bestResponseDynamics(initialProfile, data, eta, K, single_EV_method = 'WF') :
 
     '''
     initialProfile : matrice de taille (nombre de VE) x (nombre de créneaux temporels)
-    idList : liste des identifiants des VE, de taille nombre de VE
     eta : paramètre du critère d'arrêt
     K : nombre maximum d'itérations
     '''
@@ -19,33 +19,11 @@ def bestResponseDynamics(initialProfile, idList, date, eta, K, single_EV_method 
     k=0
     profile = initialProfile.copy()
     converged = False
-    J = len(idList) # nombre de VE
-
-# Récupération de la charge fixe
-    month = date.month
-    year = str(date.year)
-    season = 'summer' if month==6 else 'winter'
-    df = pd.read_csv('data/eCO2mix_RTE_Annuel-Definitif_' + year + '_' + season + '.csv', sep=';') # vecteur de taille timeSlots, se déduit de la date 
-    df["date"] = pd.to_datetime(df["date"])
-    dailyDf = df[df["date"].dt.date == pd.to_datetime(date).date()]
-    fixedLoad = dailyDf["consumption"].values #liste de la charge fixe à chaque créneau temporel, de taille NtimeSlots
-
-# Récupération des heures d'arrivée et de départ des VE
-    df = pd.read_csv('data/ev_scenarios.csv', sep=';')
-    df['day'] = pd.to_datetime(df['day'], format='%d/%m/%Y')
-    df_selection = df[df['day'].dt.date == date]
-
-    arrival = np.zeros(J)
-    departure = np.zeros(J)
-    energy_need = np.zeros(J)
-
-    for j in range(J):
-        thisType = df_selection[df_selection['ev_id'] == idList[j]]
-        
-        arrival[j] = int(thisType['time_slot_arr'].values[0])
-        departure[j] = int(thisType['time_slot_dep'].values[0])
-        energy_need[j] = float(thisType['energy_need (kWh)'].values[0])
-
+    J = initialProfile.shape[0] # nombre de VE
+    fixedLoad = data['fixedLoad']
+    arrival = data['arrival']
+    departure = data['departure']
+    energy_need = data['energy_need']
 
     while not converged and k<=K:
         k = k+1
@@ -83,17 +61,19 @@ def bestResponseDynamics(initialProfile, idList, date, eta, K, single_EV_method 
 if __name__ == "__main__":
     # Exemple d'utilisation
     np.random.seed(0)
-    J = 50 # nombre de VE
+    J = 5 # nombre de VE
     timeSlots = 48 # nombre de créneaux temporels
     initialProfile = np.random.rand(J, timeSlots) # profil initial aléatoire
     idList = np.random.randint(1, 10, size=J)  # liste des identifiants des VE
     from datetime import datetime
     date = datetime(2019, 1, 1).date() # date choisie
-    eta = 700
+    eta = 1e-2
     K = 100
-    PLOT_RESULTS = False
+    PLOT_RESULTS = True
 
-    profile = bestResponseDynamics(initialProfile, idList, date, eta, K, single_EV_method='MILP')
+    data = data_extractor(date, idList)
+
+    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='WF')
     
     if PLOT_RESULTS :
         fig, axes = plt.subplots(J, 1, figsize=(10, 12), sharex=True) 
