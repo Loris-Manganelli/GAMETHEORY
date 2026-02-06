@@ -6,7 +6,7 @@ import time
 from C02_emissions import calculate_emissions
 from data_extractor import data_extractor
 
-def bestResponseDynamics(initialProfile, data, eta, K, single_EV_method = 'WF') :
+def bestResponseDynamics(initialProfile, data, eta, K, single_EV_method = 'WF', powerMultiplicator = 1):
 
     '''
     initialProfile : matrice de taille (nombre de VE) x (nombre de créneaux temporels)
@@ -35,7 +35,7 @@ def bestResponseDynamics(initialProfile, data, eta, K, single_EV_method = 'WF') 
             elif single_EV_method == 'LP':
                 newProfile[j,:] = single_EV_linprogram(load, arrival[j], departure[j], energy_need[j]).x
             elif single_EV_method == 'WF':
-                newProfile[j,:] = single_EV_water_filling(load, arrival[j], departure[j], energy_need[j])
+                newProfile[j,:] = single_EV_water_filling(load, arrival[j], departure[j], energy_need[j], max_power=7*powerMultiplicator, power_increment=0.2*powerMultiplicator)
             else :
                 raise ValueError("Invalid method for single EV optimization. Choose 'MILP', 'LP' or 'WF'.")
 
@@ -61,7 +61,7 @@ def bestResponseDynamics(initialProfile, data, eta, K, single_EV_method = 'WF') 
 if __name__ == "__main__":
     # Exemple d'utilisation
     np.random.seed(0)
-    J = 5 # nombre de VE
+    J = 100 # nombre de VE
     timeSlots = 48 # nombre de créneaux temporels
     initialProfile = np.random.rand(J, timeSlots) # profil initial aléatoire
     idList = np.random.randint(1, 10, size=J)  # liste des identifiants des VE
@@ -69,11 +69,14 @@ if __name__ == "__main__":
     date = datetime(2019, 1, 1).date() # date choisie
     eta = 1e-2
     K = 100
-    PLOT_RESULTS = True
+    PLOT_RESULTS = False
+
+    powerMultiplicator = 1000 # multiplicateur pour les besoins énergétiques des VE, à ajuster pour tester différentes situations (ex: 10 pour simuler des camions électriques)
 
     data = data_extractor(date, idList)
+    data['energy_need'] = data['energy_need'] * powerMultiplicator
 
-    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='WF')
+    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='WF', powerMultiplicator=powerMultiplicator)
     
     if PLOT_RESULTS :
         fig, axes = plt.subplots(J, 1, figsize=(10, 12), sharex=True) 
