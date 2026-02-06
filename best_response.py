@@ -32,8 +32,22 @@ def bestResponseDynamics(initialProfile, data, eta, K, single_EV_method = 'WF', 
             load = fixedLoad + newProfile.sum(axis=0) - newProfile[j,:] # calcul de la charge totale 
             if single_EV_method == 'MILP':
                 newProfile[j,:] = single_EV_MILP(load, arrival[j], departure[j], energy_need[j], max_power=7*powerMultiplicator)
+                
+                #stability check
+                em = 0
+                for i in range(48) :
+                    em += calculate_emissions(load[i] + newProfile[j,i]) - calculate_emissions(load[i] + profile[j,i]) # émissions totales avec nouveau profil vs ancien profil
+                if abs(em) < 0.001 : # tolérance pour éviter les oscillations dues à des différences d'émissions très faibles
+                    newProfile[j,:] = profile[j,:] # on garde l'ancien profil si la différence d'émissions est négligeable
             elif single_EV_method == 'LP':
                 newProfile[j,:] = single_EV_linprogram(load, arrival[j], departure[j], energy_need[j], max_power=7*powerMultiplicator).x
+                
+                #stability check
+                em = 0
+                for i in range(48) :
+                    em += calculate_emissions(load[i] + newProfile[j,i]) - calculate_emissions(load[i] + profile[j,i]) # émissions totales avec nouveau profil vs ancien profil
+                if abs(em) < 0.001 : # tolérance pour éviter les oscillations dues à des différences d'émissions très faibles
+                    newProfile[j,:] = profile[j,:] # on garde l'ancien profil si la différence d'émissions est négligeable
             elif single_EV_method == 'WF':
                 newProfile[j,:] = single_EV_water_filling(load, arrival[j], departure[j], energy_need[j], max_power=7*powerMultiplicator, power_increment=0.2*powerMultiplicator)
             else :
@@ -61,7 +75,7 @@ def bestResponseDynamics(initialProfile, data, eta, K, single_EV_method = 'WF', 
 if __name__ == "__main__":
     # Exemple d'utilisation
     np.random.seed(0)
-    J = 1000 # nombre de VE
+    J = 10 # nombre de VE
     timeSlots = 48 # nombre de créneaux temporels
     initialProfile = np.random.rand(J, timeSlots) # profil initial aléatoire
     idList = np.random.randint(1, 10, size=J)  # liste des identifiants des VE
@@ -71,12 +85,12 @@ if __name__ == "__main__":
     K = 100
     PLOT_RESULTS = True
 
-    powerMultiplicator = 15 # multiplicateur pour les besoins énergétiques des VE, à ajuster pour tester différentes situations (ex: 10 pour simuler des camions électriques)
+    powerMultiplicator = 1500 # multiplicateur pour les besoins énergétiques des VE, à ajuster pour tester différentes situations (ex: 10 pour simuler des camions électriques)
 
     data = data_extractor(date, idList)
     data['energy_need'] = data['energy_need'] * powerMultiplicator
 
-    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='WF', powerMultiplicator=powerMultiplicator)
+    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='MILP', powerMultiplicator=powerMultiplicator)
     
     if PLOT_RESULTS :
         total_load = data['fixedLoad'] + profile.sum(axis=0)
