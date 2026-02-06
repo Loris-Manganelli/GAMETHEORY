@@ -98,7 +98,7 @@ if __name__ == "__main__":
     arrival = 36
     departure = 14
     energy_need = 80000
-    max_power = 7000
+    max_power = 10000
 
 
     
@@ -108,7 +108,6 @@ if __name__ == "__main__":
     print("MILP computation time: ", t1 - t0, " seconds")
     charging_schedule_lp = single_EV_linprogram(load, arrival, departure, energy_need, max_power)
     t2 = time.time()
-    print(charging_schedule_lp.x.sum() * 0.5) #total energy charged in kWh
     print("LP computation time: ", t2 - t1, " seconds")
     charging_schedule_WF = single_EV_water_filling(load, arrival, departure, energy_need, max_power, max_power/100)
     t3 = time.time()
@@ -134,6 +133,8 @@ if __name__ == "__main__":
     plt.plot(load+charging_schedule_lp.x, label='EV Charging (LP)')
     plt.plot(load+charging_schedule_milp, label='EV Charging (MILP)')
     plt.plot(load+charging_schedule_WF, label='EV Charging (WF)')
+    plt.axvline(x=arrival, linestyle='--', label='Arrival Time', color='green')
+    plt.axvline(x=departure, linestyle='--', label='Departure Time', color='red')
     plt.xlabel('Time Slot (30 min each)')   
     plt.ylabel('Power (kW)')
     plt.legend()

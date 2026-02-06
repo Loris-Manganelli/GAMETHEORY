@@ -17,7 +17,7 @@ def solve_UC(load, ordered_list, max_prod):
         remaining_load -= prod
     return production
 
-def calculate_emissions(load):
+def calculate_emissions(load):  # note : here the load corresponds to total load, including all flexible and non flexible
     #data
     #costs = dict(coal=86, gas=70, solar=0, wind=0, nuclear=30, hydro=0, fuel=162, bioen=0) #€/MWh
     CO2_em = dict(coal=986, gas=429, solar=0, wind=0, nuclear=0, hydro=0, fuel=777, bioen=494) #gCO2/kWh
