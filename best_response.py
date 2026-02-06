@@ -31,9 +31,9 @@ def bestResponseDynamics(initialProfile, data, eta, K, single_EV_method = 'WF', 
         for j in range(J):
             load = fixedLoad + newProfile.sum(axis=0) - newProfile[j,:] # calcul de la charge totale 
             if single_EV_method == 'MILP':
-                newProfile[j,:] = single_EV_MILP(load, arrival[j], departure[j], energy_need[j])
+                newProfile[j,:] = single_EV_MILP(load, arrival[j], departure[j], energy_need[j], max_power=7*powerMultiplicator)
             elif single_EV_method == 'LP':
-                newProfile[j,:] = single_EV_linprogram(load, arrival[j], departure[j], energy_need[j]).x
+                newProfile[j,:] = single_EV_linprogram(load, arrival[j], departure[j], energy_need[j], max_power=7*powerMultiplicator).x
             elif single_EV_method == 'WF':
                 newProfile[j,:] = single_EV_water_filling(load, arrival[j], departure[j], energy_need[j], max_power=7*powerMultiplicator, power_increment=0.2*powerMultiplicator)
             else :
@@ -61,7 +61,7 @@ def bestResponseDynamics(initialProfile, data, eta, K, single_EV_method = 'WF', 
 if __name__ == "__main__":
     # Exemple d'utilisation
     np.random.seed(0)
-    J = 100 # nombre de VE
+    J = 10 # nombre de VE
     timeSlots = 48 # nombre de créneaux temporels
     initialProfile = np.random.rand(J, timeSlots) # profil initial aléatoire
     idList = np.random.randint(1, 10, size=J)  # liste des identifiants des VE
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     data = data_extractor(date, idList)
     data['energy_need'] = data['energy_need'] * powerMultiplicator
 
-    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='WF', powerMultiplicator=powerMultiplicator)
+    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='MILP', powerMultiplicator=powerMultiplicator)
     
     if PLOT_RESULTS :
         fig, axes = plt.subplots(J, 1, figsize=(10, 12), sharex=True) 
