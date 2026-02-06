@@ -3,3 +3,8 @@
 - priority : simple resolution of 1-EV problem
 
 - prove that water-filling is correct when the function is convex (not the case here !)
+
+- create a merit order or load curve that leaves a non-convex domain for the EVs to charge
+
+- compare methods : in speed and CO2 on random curves as a single problem, with different energies and max power.
+                    in speed and CO2 on the "realistic" curve with BRD and aggregation
