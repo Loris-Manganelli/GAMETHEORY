@@ -61,7 +61,7 @@ def bestResponseDynamics(initialProfile, data, eta, K, single_EV_method = 'WF', 
 if __name__ == "__main__":
     # Exemple d'utilisation
     np.random.seed(0)
-    J = 10 # nombre de VE
+    J = 1000 # nombre de VE
     timeSlots = 48 # nombre de créneaux temporels
     initialProfile = np.random.rand(J, timeSlots) # profil initial aléatoire
     idList = np.random.randint(1, 10, size=J)  # liste des identifiants des VE
@@ -69,25 +69,35 @@ if __name__ == "__main__":
     date = datetime(2019, 1, 1).date() # date choisie
     eta = 1e-2
     K = 100
-    PLOT_RESULTS = False
+    PLOT_RESULTS = True
 
-    powerMultiplicator = 1000 # multiplicateur pour les besoins énergétiques des VE, à ajuster pour tester différentes situations (ex: 10 pour simuler des camions électriques)
+    powerMultiplicator = 15 # multiplicateur pour les besoins énergétiques des VE, à ajuster pour tester différentes situations (ex: 10 pour simuler des camions électriques)
 
     data = data_extractor(date, idList)
     data['energy_need'] = data['energy_need'] * powerMultiplicator
 
-    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='MILP', powerMultiplicator=powerMultiplicator)
+    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='WF', powerMultiplicator=powerMultiplicator)
     
     if PLOT_RESULTS :
-        fig, axes = plt.subplots(J, 1, figsize=(10, 12), sharex=True) 
-
-        for i in range(J):
-            axes[i].plot(profile[i])
-            axes[i].set_title(f'Véhicule n°{i+1}, ID {idList[i]}')
-            axes[i].grid(True)
-
-        plt.xlabel('Time slots')
-        plt.ylabel('Charging Power (kW)')
-        plt.tight_layout()
-        # plt.savefig(f'files/best_response_dynamics_ev_charging_{J}_{date}.png')
+        total_load = data['fixedLoad'] + profile.sum(axis=0)
+        initial_load = data['fixedLoad']
+        plt.plot(total_load, label='Total Load with EVs')
+        plt.plot(initial_load, label='Initial Load without EVs')
+        plt.xlabel('Time Slot (30 min each)')
+        plt.ylabel('Power (kW)')
+        plt.title('Total Load Profile with Best Response Dynamics (Method: {})'.format('WF'))
+        plt.legend()
+        plt.grid(True)
         plt.show()
+        # fig, axes = plt.subplots(J, 1, figsize=(10, 12), sharex=True) 
+
+        # for i in range(J):
+        #     axes[i].plot(profile[i])
+        #     axes[i].set_title(f'Véhicule n°{i+1}, ID {idList[i]}')
+        #     axes[i].grid(True)
+
+        # plt.xlabel('Time slots')
+        # plt.ylabel('Charging Power (kW)')
+        # plt.tight_layout()
+        # # plt.savefig(f'files/best_response_dynamics_ev_charging_{J}_{date}.png')
+        # plt.show()

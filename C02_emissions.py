@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 costs = dict(coal=86, gas=70, solar=0, wind=0, nuclear=30, hydro=0, fuel=162, bioen=0) #€/MWh
-CO2_em = dict(coal=986, gas=429, solar=0, wind=0, nuclear=0, hydro=0, fuel=777, bioen=494) #gCO2/kWh
+CO2_em = dict(coal=986, gas=429, solar=0.1, wind=0.2, nuclear=0.3, hydro=0.4, fuel=777, bioen=494) #gCO2/kWh
 max_prod = dict(coal=1818, gas=12752, solar=2600, wind=6000, nuclear=61370, hydro=25504, fuel=3000, bioen=2234) #MW (adjusted for capacity)
 ordered_list = ['solar', 'wind', 'hydro', 'bioen', 'nuclear', 'gas', 'coal', 'fuel']
 
@@ -20,7 +20,7 @@ def solve_UC(load, ordered_list, max_prod):
 def calculate_emissions(load):  # note : here the load corresponds to total load, including all flexible and non flexible
     #data
     #costs = dict(coal=86, gas=70, solar=0, wind=0, nuclear=30, hydro=0, fuel=162, bioen=0) #€/MWh
-    CO2_em = dict(coal=986, gas=429, solar=0, wind=0, nuclear=0, hydro=0, fuel=777, bioen=494) #gCO2/kWh
+    CO2_em = dict(coal=986, gas=429, solar=0.1, wind=0.2, nuclear=0.3, hydro=0.4, fuel=777, bioen=494) #gCO2/kWh
     max_prod = dict(coal=1818, gas=12752, solar=2600, wind=6000, nuclear=61370, hydro=25504, fuel=3000, bioen=2234) #MW (adjusted for capacity)
     ordered_list = ['solar', 'wind', 'hydro', 'bioen', 'nuclear', 'gas', 'coal', 'fuel']
 
@@ -41,7 +41,7 @@ def calculate_emissions(load):  # note : here the load corresponds to total load
     return total_emissions / 1000000  # Convert to TCO2
 
 def grad_emissions(load):
-    CO2_em = dict(coal=986, gas=429, solar=0, wind=0, nuclear=0, hydro=0, fuel=777, bioen=494) #gCO2/kWh
+    CO2_em = dict(coal=986, gas=429, solar=0.1, wind=0.2, nuclear=0.3, hydro=0.4, fuel=777, bioen=494) #gCO2/kWh
     max_prod = dict(coal=1818, gas=12752, solar=2600, wind=6000, nuclear=61370, hydro=25504, fuel=3000, bioen=2234) #MW (adjusted for capacity)
     ordered_list = ['solar', 'wind', 'hydro', 'bioen', 'nuclear', 'gas', 'coal', 'fuel']
 
