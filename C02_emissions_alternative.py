@@ -1,14 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+#données faites pour travailler avec la courbe de charge de la journée du 5/06/2019, pour voir apparaitre la non-convexité.
+
+
 costs = dict(coal=86, gas=70, solar=0, wind=0, nuclear=30, hydro=0, fuel=162, bioen=0) #€/MWh
-CO2_em = dict(coal=986, gas=429, solar=0, wind=0, nuclear=5, hydro=0, fuel=777, bioen=494) #gCO2/kWh
-max_prod = dict(coal=1818, gas=12752, solar=2600, wind=6000, nuclear=61370, hydro=25504, fuel=3000, bioen=2234) #MW (adjusted for capacity)
+CO2_em = dict(coal=986, gas=429, solar=0.1, wind=0.2, nuclear=2, hydro=0, fuel=777, bioen=494) #gCO2/kWh
+max_prod = dict(coal=1818, gas=12752, solar=2600, wind=6000, nuclear=21370, hydro=31504, fuel=3000, bioen=4234) #MW (adjusted for capacity)
 ordered_list = ['solar', 'wind', 'hydro', 'bioen', 'nuclear', 'gas', 'coal', 'fuel']
 def get_max_prod():
     return max_prod
 def getCO2_em():
     return CO2_em
+
 
 def solve_UC(load, ordered_list, max_prod):
     production = dict((tech, 0) for tech in ordered_list)
@@ -25,7 +30,7 @@ def calculate_emissions(load):  # note : here the load corresponds to total load
     #data
     #costs = dict(coal=86, gas=70, solar=0, wind=0, nuclear=30, hydro=0, fuel=162, bioen=0) #€/MWh
     CO2_em = getCO2_em() #gCO2/kWh
-    max_prod = get_max_prod()
+    max_prod = get_max_prod() #MW (adjusted for capacity)
     ordered_list = ['solar', 'wind', 'hydro', 'bioen', 'nuclear', 'gas', 'coal', 'fuel']
 
     #solve simplified UC

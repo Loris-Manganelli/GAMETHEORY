@@ -1,0 +1,1 @@
+There are two possibilities for CO2 emissions calculation : one with real data from the french power system, one that is tweaked as to make the CO2 emissions curve non-convex. make sure to choose the right one when running best_reponse, or single_EV_problem

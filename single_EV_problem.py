@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import linprog
 import scipy.optimize
-from C02_emissions import grad_emissions, calculate_emissions
+from C02_emissions import getCO2_em, grad_emissions, calculate_emissions, get_max_prod
 import time
 
 def single_EV_water_filling(load, arrival, departure, energy_need, max_power = 7, power_increment = 0.2) :
@@ -24,8 +24,8 @@ def single_EV_linprogram(load, arrival, departure, energy_need, max_power = 7) :
 
 #prepare data for MILP formulation
 costs = dict(coal=86, gas=70, solar=0, wind=0, nuclear=30, hydro=0, fuel=162, bioen=0) #€/MWh
-CO2_em = dict(coal=986, gas=429, solar=0.1, wind=0.2, nuclear=0.3, hydro=0.4, fuel=777, bioen=494) #gCO2/kWh
-max_prod = dict(coal=1818, gas=12752, solar=2600, wind=6000, nuclear=61370, hydro=25504, fuel=3000, bioen=2234) #MW (adjusted for capacity)
+CO2_em = getCO2_em() #gCO2/kWh
+max_prod = get_max_prod()
 ordered_list = ['solar', 'wind', 'hydro', 'bioen', 'nuclear', 'gas', 'coal', 'fuel']
 
 #cumulative poduction capacity of the i first technologies (merit order)
@@ -43,7 +43,7 @@ def single_EV_MILP(load, arrival, departure, energy_need, max_power = 7):
             i0 += 1
         i0s[k] = i0 
     
-    #matrix of the Pis used for each time slot. size (J, I)
+    #matrix of the reduced cumulative powers used for each time slot. size (J, I)
     usedPis = [[Pis[i] - L[k] if i >= i0s[k] else 0 for i in range(len(Pis))] for k in range(J)] 
     I = len(Pis) #number of steps in the merit order curve
 
