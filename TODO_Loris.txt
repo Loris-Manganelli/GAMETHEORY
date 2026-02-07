@@ -1,9 +1,0 @@
-a faire :
-
-- comparer les différentes méthodes
-- regarder l'effet du nombre de VE
-- regarder l'effet de la saison
-- faire une courbe de toute la charge au cours du temps
-- comment évoluent les émissions de CO2 quand j'augmente le nombre de VE
-
-

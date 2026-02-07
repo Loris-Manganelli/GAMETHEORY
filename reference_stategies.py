@@ -5,11 +5,13 @@ def standard_strategy(arrival, departure, energy_need, max_power=7):
     charging_schedule = np.zeros(48)
     time_slot_duration = 0.5  # hours
     remaining_energy = energy_need
+
+    slotsRange = list(range(int(arrival)+1, 48)) + list(range(1, int(departure))) if arrival >= departure else list(range(int(arrival), int(departure)))
     
     # Charge at maximum power from arrival until energy need is fulfilled or departure
-    for i in range(48):
+    for i in slotsRange:
         # Check if EV is connected (between arrival and departure)
-        if (i >= arrival or i < departure) and remaining_energy > 0:
+        if remaining_energy > 0:
             # Charge at maximum power, or whatever is needed if less than max_power
             power_to_charge = min(max_power, remaining_energy / time_slot_duration)
             charging_schedule[i] = power_to_charge
@@ -26,12 +28,16 @@ def offpeak_strategy(arrival, departure, energy_need, max_power=7):
     charging_schedule = np.zeros(48)
     time_slot_duration = 0.5  # hours
     remaining_energy = energy_need
-    offpeak_start = 44  # 10 PM in 30-minute slots
+
+    startCharging = max(44, int(arrival)+1)
+
+    slotsRange = list(range(startCharging, 48)) + list(range(1, int(departure))) if arrival >= departure else list(range(int(arrival), int(departure)))
     
-    # Charge at maximum power during off-peak hours only
-    for i in range(48):
-        # Check if EV is connected and in off-peak hours
-        if (i >= arrival or i < departure) and i >= offpeak_start and remaining_energy > 0:
+    # Charge at maximum power from arrival until energy need is fulfilled or departure
+    for i in slotsRange:
+        # Check if EV is connected (between arrival and departure)
+        if remaining_energy > 0:
+            # Charge at maximum power, or whatever is needed if less than max_power
             power_to_charge = min(max_power, remaining_energy / time_slot_duration)
             charging_schedule[i] = power_to_charge
             remaining_energy -= power_to_charge * time_slot_duration

@@ -20,9 +20,9 @@ plt.rcParams['figure.figsize'] = (14, 10)
 np.random.seed(0)
 
 #### Parametres à choisir
-J = 100 # nombre de VE
-date = datetime(2019, 1, 1).date() # date choisie
-powerMultiplicator = 75000
+J = 30 # nombre de VE
+date = datetime(2019, 6, 30).date() # date choisie
+powerMultiplicator = 750
 ###
 
 timeSlots = 48 # nombre de créneaux temporels
@@ -112,23 +112,53 @@ ax3.set_ylabel('CO2 Emissions (TCO2)', fontsize=11, fontweight='bold')
 ax3.set_title('Time vs Emissions Trade-off', fontsize=12, fontweight='bold')
 ax3.grid(True, alpha=0.3)
 
-
-# plt.tight_layout()
-
-# Save figure
-output_path = Path(__file__).parent / 'performance_comparison_results.png'
-plt.savefig(output_path, dpi=300, bbox_inches='tight')
-print(f"Comparison plots saved to {output_path}")
-
-# Print summary
-print("\n" + "="*60)
-print("PERFORMANCE COMPARISON SUMMARY (Jan 01 2019, 50 EVs)")
-print("="*60)
-for strategy in strategies:
-    print(f"\n{strategy}:")
-    print(f"  Computation Time: {computation_times[strategy]:.4f}s")
-    print(f"  CO2 Emissions: {co2_emissions[strategy]:.2f}kg")
-
 plt.suptitle(f'Performance Comparison of EV Charging Strategies, day : {date}, number of EVs: {J}, power multiplier: {powerMultiplicator}', fontsize=14, fontweight='bold')
-plt.show()
 
+
+
+# Create three separate figures for load profiles
+fig_standard = plt.figure(figsize=(14, 6))
+ax_std = fig_standard.add_subplot(111)
+fixed_load = data['fixedLoad']
+ev_load_standard = results['Standard'].sum(axis=0)
+ax_std.plot(fixed_load, label='Fixed Load', linewidth=2, color='#FF6B6B')
+ax_std.plot(fixed_load + ev_load_standard, label='Fixed Load + EV Load (Standard)', linewidth=2, color='#4ECDC4')
+ax_std.fill_between(range(timeSlots), fixed_load, fixed_load + ev_load_standard, alpha=0.2, color='#4ECDC4')
+ax_std.set_xlabel('Time Slot', fontsize=11, fontweight='bold')
+ax_std.set_ylabel('Load (kW)', fontsize=11, fontweight='bold')
+ax_std.set_title('Load Profile - Standard Strategy', fontsize=12, fontweight='bold')
+ax_std.legend(fontsize=10)
+ax_std.grid(True, alpha=0.3)
+fig_standard.tight_layout()
+
+
+fig_offpeak = plt.figure(figsize=(14, 6))
+ax_off = fig_offpeak.add_subplot(111)
+ev_load_offpeak = results['OffPeak'].sum(axis=0)
+ax_off.plot(fixed_load, label='Fixed Load', linewidth=2, color='#FF6B6B')
+ax_off.plot(fixed_load + ev_load_offpeak, label='Fixed Load + EV Load (OffPeak)', linewidth=2, color='#45B7D1')
+ax_off.fill_between(range(timeSlots), fixed_load, fixed_load + ev_load_offpeak, alpha=0.2, color='#45B7D1')
+ax_off.set_xlabel('Time Slot', fontsize=11, fontweight='bold')
+ax_off.set_ylabel('Load (kW)', fontsize=11, fontweight='bold')
+ax_off.set_title('Load Profile - OffPeak Strategy', fontsize=12, fontweight='bold')
+ax_off.legend(fontsize=10)
+ax_off.grid(True, alpha=0.3)
+fig_offpeak.tight_layout()
+
+
+fig_brd = plt.figure(figsize=(14, 6))
+ax_brd = fig_brd.add_subplot(111)
+ev_load_brd = results['BRD_WF'].sum(axis=0)
+ax_brd.plot(fixed_load, label='Fixed Load', linewidth=2, color='#FF6B6B')
+ax_brd.plot(fixed_load + ev_load_brd, label='Fixed Load + EV Load (BRD WF)', linewidth=2, color='#96CEB4')
+ax_brd.fill_between(range(timeSlots), fixed_load, fixed_load + ev_load_brd, alpha=0.2, color='#96CEB4')
+ax_brd.set_xlabel('Time Slot', fontsize=11, fontweight='bold')
+ax_brd.set_ylabel('Load (kW)', fontsize=11, fontweight='bold')
+ax_brd.set_title('Load Profile - Best Response Dynamics (WF)', fontsize=12, fontweight='bold')
+ax_brd.legend(fontsize=10)
+ax_brd.grid(True, alpha=0.3)
+fig_brd.tight_layout()
+
+
+
+plt.show()
