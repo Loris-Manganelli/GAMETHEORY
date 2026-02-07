@@ -85,12 +85,12 @@ if __name__ == "__main__":
     K = 100
     PLOT_RESULTS = True
 
-    powerMultiplicator = 1500 # multiplicateur pour les besoins énergétiques des VE, à ajuster pour tester différentes situations (ex: 10 pour simuler des camions électriques)
+    powerMultiplicator = 750 # multiplicateur pour les besoins énergétiques des VE, à ajuster pour tester différentes situations (ex: 10 pour simuler des camions électriques)
 
     data = data_extractor(date, idList)
     data['energy_need'] = data['energy_need'] * powerMultiplicator
 
-    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='MILP', powerMultiplicator=powerMultiplicator)
+    profile = bestResponseDynamics(initialProfile, data, eta, K, single_EV_method='WF', powerMultiplicator=powerMultiplicator)
     
     if PLOT_RESULTS :
         total_load = data['fixedLoad'] + profile.sum(axis=0)

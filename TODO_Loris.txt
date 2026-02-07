@@ -1,7 +1,9 @@
 a faire :
 
-- faire une fonction qui compare les résultats des émissions totales + temps de calculs avec Water filling, LP, MILP
-- coder la possibilité de faire des véhicules représentatifs
-- comparer les différentes méthodes sur un seul VE avec les vrais données
-- comparer les différentes méthodes avec tous les VE et best-response dynamics
+- comparer les différentes méthodes
+- regarder l'effet du nombre de VE
+- regarder l'effet de la saison
+- faire une courbe de toute la charge au cours du temps
+- comment évoluent les émissions de CO2 quand j'augmente le nombre de VE
+
 

@@ -1,11 +1,7 @@
 import numpy as np
 
-def standard_strategy(data, max_power=7):
+def standard_strategy(arrival, departure, energy_need, max_power=7):
     
-    arrival = data['arrival']
-    departure = data['departure']
-    energy_need = data['energy_need']
-
     charging_schedule = np.zeros(48)
     time_slot_duration = 0.5  # hours
     remaining_energy = energy_need
@@ -25,16 +21,12 @@ def standard_strategy(data, max_power=7):
     return charging_schedule
 
 
-def offpeak_strategy(data, max_power=7):
-
-    arrival = data['arrival']
-    departure = data['departure']
-    energy_need = data['energy_need']
+def offpeak_strategy(arrival, departure, energy_need, max_power=7):
 
     charging_schedule = np.zeros(48)
     time_slot_duration = 0.5  # hours
     remaining_energy = energy_need
-    offpeak_start = 40  # 10 PM (20:00 in 24h format = slot 40 in 48-slot day)
+    offpeak_start = 44  # 10 PM in 30-minute slots
     
     # Charge at maximum power during off-peak hours only
     for i in range(48):
@@ -46,6 +38,34 @@ def offpeak_strategy(data, max_power=7):
         
         if remaining_energy <= 0:
             break
+    
+    return charging_schedule
+
+
+
+def standard_strategy_collective(data, max_power=7):
+
+    arrival = data['arrival']
+    departure = data['departure']
+    energy_need = data['energy_need']
+
+    charging_schedule = np.zeros((len(arrival), 48))
+    
+    for j in range(len(arrival)):
+        charging_schedule[j] = standard_strategy(arrival[j], departure[j], energy_need[j], max_power)
+    
+    return charging_schedule
+
+def offpeak_strategy_collective(data, max_power=7):
+
+    arrival = data['arrival']
+    departure = data['departure']
+    energy_need = data['energy_need']
+
+    charging_schedule = np.zeros((len(arrival), 48))
+    
+    for j in range(len(arrival)):
+        charging_schedule[j] = offpeak_strategy(arrival[j], departure[j], energy_need[j], max_power)
     
     return charging_schedule
 
